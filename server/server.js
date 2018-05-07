@@ -1,13 +1,15 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 
-const {mongoose} = require('./db/mongoose');
-const {Todo} = require('./models/todos');
-const {User} = require('./models/user');
+var {mongoose} = require('./db/mongoose');
+var {Todo} = require('./models/todos');
+var {User} = require('./models/user');
 
 var app = express();
 
 app.use(bodyParser.json());
+
+//Send post request for making a new Todo item
 
 app.post('/todos', (req, res) => {
     var todo = new Todo({
@@ -25,3 +27,5 @@ app.post('/todos', (req, res) => {
 app.listen(3000, () => {
     console.log('Started on port 3000');
 });
+
+module.exports = {app}
