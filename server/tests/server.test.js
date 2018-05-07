@@ -4,12 +4,21 @@ const request = require('supertest');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todos');
 
+//Make an array of dummy TODOS
+
+const todos =[{
+    text: 'First Test Todo'
+}, {
+    text: 'Second Test Todo'
+}]
 
 //before each it will remove the database
 //runs before every test case
 
 beforeEach((done) => {
-    Todo.remove({}).then(()=> done());
+    Todo.remove({}).then(() => {
+        Todo.insertMany(todos);
+    }).then(() => done());
 });
 
 
@@ -33,7 +42,7 @@ describe('POST /todos', () => {
             //Make a call to the database to verify the test todo is created
             //Assert there is a Todo
             //check if it matches text variable
-            Todo.find().then((todos) => {
+            Todo.find({text}).then((todos) => {
                 expect(todos.length).toBe(1);
                 expect(todos[0].text).toBe(text);
                 done();
@@ -51,9 +60,21 @@ describe('POST /todos', () => {
             }
 
             Todo.find().then((todos) => {
-                expect(todos.length).toBe(0);
+                expect(todos.length).toBe(2);
                 done();
             }).catch((e) => done(e));
         });
+    });
+});
+
+describe('GET /todos', () => {
+    it('should get all todos', (done) => {
+        request(app)
+        .get('/todos')
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.todos.length).toBe(2)
+        })
+        .end(done);
     });
 });
