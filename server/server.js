@@ -42,10 +42,10 @@ app.get('/todos/:id', (req, res) => {
     //validate id using isValid
     //return 404 and stop function - send back empty body
     if (!ObjectID.isValid(id)) {
-        return res.status(400).send();
+        return res.status(404).send();
     }
     //findbyID
-    Todo.find(ObjectID(id)).then((todo) => {
+    Todo.findById(id).then((todo) => {
         //success case
         if (!todo) {
             return res.status(404).send();
