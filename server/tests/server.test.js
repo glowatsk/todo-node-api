@@ -152,23 +152,46 @@ describe('DELETE /todos/:id', () => {
     });
 });
 
-describe('PATCH /todos/:id' () => {
+describe('PATCH /todos/:id', () => {
     it('should update the todo', (done) => {
         //grab id of first item
-        var requestID = todos._id
+        var requestID = todos[0]._id
+        var text = 'This has been changed'
         //update text, set completed true
         request(app)
         .patch(`/todos/${requestID}`)
-        .body('This has been changed')
-        .expect(2)
-        //200
+        .send({
+            text, 
+            completed: true
+        })
+          // expect 200 response
+        .expect(200)
         //text is changed, completed is true, completedAt is a number using .toBeA
+        .expect((res) => {
+            expect(res.body.todo.text).toBe(text);
+            expect(res.body.todo.completed).toBe(true);
+            expect(res.body.todo.completedAt).not.toBe(null);
+        })
+        .end(done)
     });
 
     it('should clear completedAt when todo is not completed', (done) => {
         //grab id of second todo item
+        var idSecondRequestItem = todos[1]._id
         // update text, set completed to false
+        request(app)
+        .patch(`/todos/${idSecondRequestItem}`)
+        .send({
+            text:"I haven't done this yet",
+            completed: false
+        })
         //200
+        .expect(200)
         //text is changed, completed is now false, completed at is null .toNotExist
+        .expect((res) => {
+            expect(res.body.todo.completed).toBe(false);
+            expect(res.body.todo.completedAt).toBe(null);
+        })
+        .end(done)
     })
 });
