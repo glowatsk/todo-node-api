@@ -1,12 +1,13 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var {ObjectID} = require('mongodb');
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser');
+const {ObjectID} = require('mongodb');
 
-var {mongoose} = require('./db/mongoose');
-var {Todo} = require('./models/todos');
-var {User} = require('./models/user');
+const {mongoose} = require('./db/mongoose');
+const {Todo} = require('./models/todos');
+const {User} = require('./models/user');
 
-var app = express();
+const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
@@ -79,6 +80,37 @@ app.delete('/todos/:id', (req, res) => {
     });
 });
 
+app.patch('/todos/:id', (req, res) => {
+    var id = req.params.id;
+
+    //lodash allows us to pick components from the body
+    var body = _.pick(req.body, ['text', 'completed']);
+
+    //Validate ID if not valid return 404
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+    if (_.isBoolean(body.completed) && body.completed) {
+        //This gets a new Unix Epic Date
+        body.completedAt = new Date().getTime();
+    } else {
+        //
+        body.completed = false;
+        body.completedAt = null;
+    }
+    //have to use the mongo set property to change body
+    Todo.findByIdAndUpdate(id, {$set:body}, {new: true}).then((todo) => {
+    //Check if todo exists
+        if (!todo) {
+            return res.status(404).send();
+        }
+    //if it exists send the fetched todo
+        res.send({todo})
+    }).catch((e) => {
+        res.status(400).send();
+    })
+
+});
 
 app.listen(port, () => {
     console.log(`Started on port ${port}`);
