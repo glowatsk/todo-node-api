@@ -13,7 +13,9 @@ const todos =[{
     text: 'First Test Todo'
 }, {
     _id: new ObjectID(),
-    text: 'Second Test Todo'
+    text: 'Second Test Todo',
+    completed: true,
+    completedAt: 333
 }]
 
 //before each it will remove the database
@@ -148,4 +150,25 @@ describe('DELETE /todos/:id', () => {
         .expect(404)
         .end(done);
     });
+});
+
+describe('PATCH /todos/:id' () => {
+    it('should update the todo', (done) => {
+        //grab id of first item
+        var requestID = todos._id
+        //update text, set completed true
+        request(app)
+        .patch(`/todos/${requestID}`)
+        .body('This has been changed')
+        .expect(2)
+        //200
+        //text is changed, completed is true, completedAt is a number using .toBeA
+    });
+
+    it('should clear completedAt when todo is not completed', (done) => {
+        //grab id of second todo item
+        // update text, set completed to false
+        //200
+        //text is changed, completed is now false, completed at is null .toNotExist
+    })
 });
