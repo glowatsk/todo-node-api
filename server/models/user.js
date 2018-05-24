@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 
-//create new user mongoose model
-var User = mongoose.model('User', {
+// create a new user schema
+
+var UserSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
@@ -30,6 +33,29 @@ var User = mongoose.model('User', {
             required: true
         }
     }]
-});
+})
+
+// Creating a new user object to not return the password just picks the ID and the email
+UserSchema.methods.toJSON = function () {
+    var user =this;
+    var userObject = user.toObject();
+
+    return _.pick(userObject, ['_id', 'email']);
+};
+
+UserSchema.methods.generateAuthToken = function () {
+    var user = this;
+    var access = 'auth';
+    var token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
+
+    user.tokens = user.tokens.concat([{access, token}]);
+
+    return user.save().then(() => {
+        return token;
+    });
+};
+
+//create new user mongoose model
+var User = mongoose.model('User', UserSchema);
 
 module.exports = {User};

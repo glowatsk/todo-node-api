@@ -2,11 +2,11 @@ require('./config/config');
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
-const {ObjectID} = require('mongodb');
+const { ObjectID } = require('mongodb');
 
-const {mongoose} = require('./db/mongoose');
-const {Todo} = require('./models/todos');
-const {User} = require('./models/user');
+const { mongoose } = require('./db/mongoose');
+const { Todo } = require('./models/todos');
+const { User } = require('./models/user');
 
 const app = express();
 const port = process.env.PORT;
@@ -31,7 +31,7 @@ app.post('/todos', (req, res) => {
 //Send Get Request to fetch all Todos, returns an object.
 app.get('/todos', (req, res) => {
     Todo.find().then((todos) => {
-        res.send({todos});
+        res.send({ todos });
     }, (e) => {
         res.status(400).send(e);
     });
@@ -53,11 +53,11 @@ app.get('/todos/:id', (req, res) => {
         if (!todo) {
             return res.status(404).send();
         }
-        res.send({todo});
-        }).catch((e) => {
-            //error case
-            res.status(400).send();
-        });
+        res.send({ todo });
+    }).catch((e) => {
+        //error case
+        res.status(400).send();
+    });
 });
 
 app.delete('/todos/:id', (req, res) => {
@@ -74,8 +74,8 @@ app.delete('/todos/:id', (req, res) => {
         if (!todo) {
             return res.status(404).send();
         }
-        res.send({todo});
-     //error send back 400 with empty body
+        res.send({ todo });
+        //error send back 400 with empty body
     }).catch((e) => {
         res.status(400).send();
     });
@@ -100,13 +100,13 @@ app.patch('/todos/:id', (req, res) => {
         body.completedAt = null;
     }
     //have to use the mongo set property to change body
-    Todo.findByIdAndUpdate(id, {$set:body}, {new: true}).then((todo) => {
-    //Check if todo exists
+    Todo.findByIdAndUpdate(id, { $set: body }, { new: true }).then((todo) => {
+        //Check if todo exists
         if (!todo) {
             return res.status(404).send();
         }
-    //if it exists send the fetched todo
-        res.send({todo})
+        //if it exists send the fetched todo
+        res.send({ todo })
     }).catch((e) => {
         res.status(400).send();
     })
@@ -117,9 +117,14 @@ app.patch('/todos/:id', (req, res) => {
 
 app.post('/users', (req, res) => {
     var body = _.pick(req.body, ['email', 'password']);
-    var user = new User(body); 
-    user.save().then((user) => {
-        res.status(200).send(user);
+    var user = new User(body);
+    user.save().then(() => {
+        // Generate the authentication token
+        return user.generateAuthToken();
+
+    }).then((token) => {
+        // x-auth x means a custom header and we are sending the JWT token.
+        res.header('x-auth', token).send(user);
     }).catch((e) => {
         res.status(400).send(e);
     })
@@ -129,4 +134,4 @@ app.listen(port, () => {
     console.log(`Started on port ${port}`);
 });
 
-module.exports = {app}
+module.exports = { app }
