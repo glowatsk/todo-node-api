@@ -7,6 +7,7 @@ const { ObjectID } = require('mongodb');
 const { mongoose } = require('./db/mongoose');
 const { Todo } = require('./models/todos');
 const { User } = require('./models/user');
+const {authenticate} = require('./middleware/authenticate')
 
 const app = express();
 const port = process.env.PORT;
@@ -26,7 +27,6 @@ app.post('/todos', (req, res) => {
         res.status(400).send(e);
     });
 });
-
 
 //Send Get Request to fetch all Todos, returns an object.
 app.get('/todos', (req, res) => {
@@ -142,6 +142,10 @@ app.get('/users/me', (req, res) => {
     }).catch((e) => {
         res.status(401).send();
     });
+});
+
+app.get('/users/me', authenticate, (req, res) => {
+    res.send(req.user);
 });
 
 app.listen(port, () => {
