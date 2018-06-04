@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 // create a new user schema
 
@@ -15,7 +16,7 @@ var UserSchema = new mongoose.Schema({
         unique: true,
         validate: {
             validator: validator.isEmail,
-            message: '${VALUE} is not a valid email'    
+            message: '{VALUE} is not a valid email'
         }
     },
     password: {
@@ -27,7 +28,7 @@ var UserSchema = new mongoose.Schema({
         access: {
             type: String,
             required: true
-        }, 
+        },
         token: {
             type: String,
             required: true
@@ -37,7 +38,7 @@ var UserSchema = new mongoose.Schema({
 
 // Creating a new user object to not return the password just picks the ID and the email
 UserSchema.methods.toJSON = function () {
-    var user =this;
+    var user = this;
     var userObject = user.toObject();
 
     return _.pick(userObject, ['_id', 'email']);
@@ -46,9 +47,9 @@ UserSchema.methods.toJSON = function () {
 UserSchema.methods.generateAuthToken = function () {
     var user = this;
     var access = 'auth';
-    var token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
+    var token = jwt.sign({ _id: user._id.toHexString(), access }, 'abc123').toString();
 
-    user.tokens = user.tokens.concat([{access, token}]);
+    user.tokens = user.tokens.concat([{ access, token }]);
 
     return user.save().then(() => {
         return token;
@@ -60,21 +61,41 @@ UserSchema.statics.findByToken = function (token) {
     var decoded;
 
     // Try / Catch block to verify the token
-    try{
-      jwt.verify(token, 'abc123');
+    try {
+        jwt.verify(token, 'abc123');
     } catch (e) {
-      return Promise.reject();
+        return Promise.reject();
     }
 
     return User.findOne({
-      '_id': decoded._id,
-      'tokens.token': token,
-      'token.access': 'auth'
+        '_id': decoded._id,
+        'tokens.token': token,
+        'token.access': 'auth'
     });
 
 };
 
+//Mongo middleware runs before
+
+UserSchema.pre('save', function (next) {
+    var user = this;
+
+    if (user.isModified('password')) {
+        //Generate a salt with bcrypt
+        bcrypt.genSalt(120, (err, salt) => {
+            //Hash using the generate salt
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                //Set user.password to hash value
+                user.password = hash;
+                next();
+            });
+        });
+    } else {
+        next();
+    }
+});
+
 //create new user mongoose model
 var User = mongoose.model('User', UserSchema);
 
-module.exports = {User};
+module.exports = { User };
