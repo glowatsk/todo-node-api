@@ -6,9 +6,9 @@ const bodyParser = require('body-parser');
 const { ObjectID } = require('mongodb');
 
 const { mongoose } = require('./db/mongoose');
-const { Todo } = require('./models/todos');
+const { Todo } = require('./models/todo');
 const { User } = require('./models/user');
-const {authenticate} = require('./middleware/authenticate')
+const { authenticate } = require('./middleware/authenticate');
 
 const app = express();
 const port = process.env.PORT;
@@ -132,26 +132,9 @@ app.post('/users', (req, res) => {
     })
 });
 
-
-app.get('/users/me', (req, res) => {
-    var token = req.header('x-auth');
-
-    User.findByToken(token).then((user) => {
-        if (!user) {
-          //Make the function automatically stop and forces the catch to send 401
-            return Promise.reject();
-        }
-        res.send(user);
-    }).catch((e) => {
-        res.status(401).send();
-    });
-});
-
-
 app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user);
 });
-
 
 app.listen(port, () => {
     console.log(`Started on port ${port}`);

@@ -47,7 +47,7 @@ UserSchema.methods.toJSON = function () {
 UserSchema.methods.generateAuthToken = function () {
     var user = this;
     var access = 'auth';
-    var token = jwt.sign({ _id: user._id.toHexString(), access }, 'abc123').toString();
+    var token = jwt.sign({ _id: user._id.toHexString(), access}, 'abc123').toString();
 
     user.tokens = user.tokens.concat([{ access, token }]);
 
@@ -62,7 +62,7 @@ UserSchema.statics.findByToken = function (token) {
 
     // Try / Catch block to verify the token
     try {
-        jwt.verify(token, 'abc123');
+        decoded = jwt.verify(token, 'abc123');
     } catch (e) {
         return Promise.reject();
     }
@@ -70,19 +70,19 @@ UserSchema.statics.findByToken = function (token) {
     return User.findOne({
         '_id': decoded._id,
         'tokens.token': token,
-        'token.access': 'auth'
+        'tokens.access': 'auth'
     });
 
 };
 
-//Mongo middleware runs before
+//Mongo middleware runs before items hit the database
 
 UserSchema.pre('save', function (next) {
     var user = this;
 
     if (user.isModified('password')) {
         //Generate a salt with bcrypt
-        bcrypt.genSalt(120, (err, salt) => {
+        bcrypt.genSalt(10, (err, salt) => {
             //Hash using the generate salt
             bcrypt.hash(user.password, salt, (err, hash) => {
                 //Set user.password to hash value
