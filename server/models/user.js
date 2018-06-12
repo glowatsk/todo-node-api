@@ -75,6 +75,12 @@ UserSchema.statics.findByToken = function (token) {
 
 };
 
+UserSchema.statics.findByCredentials = function (email, password) {
+    var User = this;
+
+    User.findOne({email})
+};
+
 //Mongo middleware runs before items hit the database
 
 UserSchema.pre('save', function (next) {
