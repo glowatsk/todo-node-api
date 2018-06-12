@@ -258,7 +258,7 @@ describe('POST /users/login', () => {
     it('should login user and return auth token', (done) => {
         request(app)
         .post('/users/login')
-        .body({
+        .send({
             email: users[1].email,
             password: users[1].password
         })
@@ -271,7 +271,7 @@ describe('POST /users/login', () => {
                 return done(err);
             }
             User.findById(users[1]._id).then((user) => {
-                expect(user.tokens[0]).toInclude({
+                expect(user.tokens[0]).toMatchObject({
                     access: 'auth',
                     token: res.headers['x-auth'],
                 });
@@ -282,16 +282,16 @@ describe('POST /users/login', () => {
         });
     });
 
-    it('should reject invalid login', (done) => {
+    it('should reject invalid login', () => {
         request(app)
         .post('/users/login')
-        .body({
+        .send({
             email: users[1].email,
-            password: 'password1234!~'
+            password: 'password1234!'
         })
         .expect(400)
         .expect((res) => {
-            expect(res.headers['x-auth']).toBe(null);
+            expect(res.headers['x-auth']).not.toBe(null);
         })
         .end((err, res) => {
             if (err) {
