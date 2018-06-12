@@ -18,9 +18,10 @@ app.use(bodyParser.json());
 
 //Send post request for making a new Todo item
 
-app.post('/todos', (req, res) => {
+app.post('/todos', authenticate, (req, res) => {
     var todo = new Todo({
-        text: req.body.text
+        text: req.body.text,
+        _creator: req.user._id
     });
 
     todo.save().then(((doc) => {
@@ -31,8 +32,10 @@ app.post('/todos', (req, res) => {
 });
 
 //Send Get Request to fetch all Todos, returns an object.
-app.get('/todos', (req, res) => {
-    Todo.find().then((todos) => {
+app.get('/todos', authenticate, (req, res) => {
+    Todo.find({
+        _creator: req.user._id
+    }).then((todos) => {
         res.send({ todos });
     }, (e) => {
         res.status(400).send(e);
@@ -41,7 +44,7 @@ app.get('/todos', (req, res) => {
 
 // GET /todos/123456
 
-app.get('/todos/:id', (req, res) => {
+app.get('/todos/:id', authenticate, (req, res) => {
     var id = req.params.id;
 
     //validate id using isValid
@@ -50,7 +53,11 @@ app.get('/todos/:id', (req, res) => {
         return res.status(404).send();
     }
     //findbyID
-    Todo.findById(id).then((todo) => {
+    Todo.findOne({
+        _id: id,
+        _creator: req.user._id
+    })
+    .then((todo) => {
         //success case
         if (!todo) {
             return res.status(404).send();
@@ -62,7 +69,7 @@ app.get('/todos/:id', (req, res) => {
     });
 });
 
-app.delete('/todos/:id', (req, res) => {
+app.delete('/todos/:id', authenticate, (req, res) => {
     //get the id from URL
     var id = req.params.id;
 
@@ -71,7 +78,11 @@ app.delete('/todos/:id', (req, res) => {
         return res.status(404).send();
     }
     //remove todo by ID
-    Todo.findByIdAndRemove(id).then((todo) => {
+    Todo.findOneAndRemove({
+        _id: id,
+        _creator: req.user._id
+    })
+    .then((todo) => {
         //success, check if doc actually came back, if not return 404
         if (!todo) {
             return res.status(404).send();
@@ -83,7 +94,7 @@ app.delete('/todos/:id', (req, res) => {
     });
 });
 
-app.patch('/todos/:id', (req, res) => {
+app.patch('/todos/:id', authenticate, (req, res) => {
     var id = req.params.id;
 
     //lodash allows us to pick components from the body
@@ -102,7 +113,11 @@ app.patch('/todos/:id', (req, res) => {
         body.completedAt = null;
     }
     //have to use the mongo set property to change body
-    Todo.findByIdAndUpdate(id, { $set: body }, { new: true }).then((todo) => {
+    Todo.findOneAndUpdate({
+        _id: id,
+        _creator: req.user._id
+    }, { $set: body }, { new: true })
+    .then((todo) => {
         //Check if todo exists
         if (!todo) {
             return res.status(404).send();
