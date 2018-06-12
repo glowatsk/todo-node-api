@@ -85,16 +85,8 @@ UserSchema.statics.findByToken = function (token) {
 
 };
 
-<<<<<<< HEAD
+
 UserSchema.statics.findByCredentials = function (email, password) {
-    var User = this;
-
-    User.findOne({email})
-};
-
-=======
-
-UserSchema.statistics.findByCredentials = function (email, password) {
     var User = this;
 
     return User.findOne({email}).then((user) => {
@@ -113,7 +105,6 @@ UserSchema.statistics.findByCredentials = function (email, password) {
         });
     });
 }
->>>>>>> b5ca10dcf5e680ee5ac3767ac288094b2c4e70a2
 //Mongo middleware runs before items hit the database
 
 UserSchema.pre('save', function (next) {
