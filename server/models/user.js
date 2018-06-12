@@ -56,6 +56,16 @@ UserSchema.methods.generateAuthToken = function () {
     });
 };
 
+UserSchema.methods.removeToken = function (token) {
+    var user = this;
+
+    return user.update({
+        $pull:{
+            tokens: {token}
+        }
+    });
+};
+
 UserSchema.statics.findByToken = function (token) {
     var User = this;
     var decoded;
@@ -75,12 +85,35 @@ UserSchema.statics.findByToken = function (token) {
 
 };
 
+<<<<<<< HEAD
 UserSchema.statics.findByCredentials = function (email, password) {
     var User = this;
 
     User.findOne({email})
 };
 
+=======
+
+UserSchema.statistics.findByCredentials = function (email, password) {
+    var User = this;
+
+    return User.findOne({email}).then((user) => {
+        if (!user) {
+            return Promise.reject();
+        }
+
+        return new Promise((resolve, reject) => {
+            bcrypt.compare(password, user.password, (err, res) => {
+                if (res) {
+                    resolve(user);
+                } else {
+                    reject();
+                }
+            });
+        });
+    });
+}
+>>>>>>> b5ca10dcf5e680ee5ac3767ac288094b2c4e70a2
 //Mongo middleware runs before items hit the database
 
 UserSchema.pre('save', function (next) {
