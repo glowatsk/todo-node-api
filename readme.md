@@ -6,24 +6,24 @@
 <li>/users</li>
 <li>/todo</li>
 
-<h5>/users</h5>
+<h3>/users</h3>
 
-POST /users to create a user.
-
-{
-    "email": "brandon@example.com",
-    "password": "examplepassword1"
-}
-
-
-POST /users/login to login as a user.
+<h4>POST /users to create a user.</h4>
 
 {
     "email": "brandon@example.com",
     "password": "examplepassword1"
 }
 
-GET /users/me
+
+<h4>POST /users/login to login as a user.</h4>
+
+{
+    "email": "brandon@example.com",
+    "password": "examplepassword1"
+}
+
+<h4>GET /users/me</h4>
 
 "x-auth": your token
 
@@ -34,24 +34,23 @@ returns logged in user
 "email": brandon@example.com
 }
 
-DELETE /users/me/token
+<h4>DELETE /users/me/token</h4>
 
 removes token
 
-GET /todos
+<h4>GET /todos</h4>
 
 "x-auth": your token
 
 returns all todos
 
-GET /todos/:id
+<h4>GET /todos/:id</h4>
 
 "x-auth": your token,
 
 fetches todo
 
-
-POST /todos
+<h4>POST /todos</h4>
 
 "x-auth": your token
 
@@ -61,7 +60,7 @@ creates a new todo
     "text": "Something to add to your todos"
 }
 
-PATCH /todos/:id
+<h4>PATCH /todos/:id</h4>
 
 "x-auth": your token,
 
@@ -72,7 +71,7 @@ updates a todo
     "completed": boolean
 }
 
-DELETE /todos/:id
+<h4>DELETE /todos/:id</h4>
 
 "x-auth": your token,
 
