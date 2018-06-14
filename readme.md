@@ -30,7 +30,7 @@
 returns logged in user
 
 {
-    _id: 12345ASd
+    _id: 12345ASd,
 "email": brandon@example.com
 }
 
