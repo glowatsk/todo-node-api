@@ -38,7 +38,7 @@ Returns logged in user.
 
 Removes authentication token.
 
-<h3>/users</h3>
+<h3>/todos</h3>
 
 <h4>GET /todos</h4>
 
