@@ -27,7 +27,7 @@
 
 "x-auth": your token
 
-returns logged in user
+Returns logged in user.
 
 {
     _id: 12345ASd,
@@ -36,25 +36,27 @@ returns logged in user
 
 <h4>DELETE /users/me/token</h4>
 
-removes token
+Removes authentication token.
+
+<h3>/users</h3>
 
 <h4>GET /todos</h4>
 
 "x-auth": your token
 
-returns all todos
+Returns all user todos.
 
 <h4>GET /todos/:id</h4>
 
-"x-auth": your token,
+"x-auth": your token
 
-fetches todo
+Fetches specific todo.
 
 <h4>POST /todos</h4>
 
 "x-auth": your token
 
-creates a new todo
+Creates a new todo for your ID.
 
 {
     "text": "Something to add to your todos"
@@ -64,7 +66,7 @@ creates a new todo
 
 "x-auth": your token,
 
-updates a todo
+Updates a todo to the new text.
 
 {
     "text": "Something to add to your todos",
@@ -75,4 +77,4 @@ updates a todo
 
 "x-auth": your token,
 
-deletes a todo
+Deleted a todo.
