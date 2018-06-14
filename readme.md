@@ -1,4 +1,4 @@
-<h1>Todo API made with Express running on Node.</h1>
+<h1>Todo API made with Express running on Node and a MongoDB database.</h1>
 
 <h3>Deployed to heroku @ https://arcane-waters-78294.herokuapp.com</h3>
 
